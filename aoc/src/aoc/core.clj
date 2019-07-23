@@ -4,25 +4,6 @@
 ;; A little much, I'm trying to practice clojure some more
 ;; to run: put this in a file, have clojure, run clojure ./<file>.clj
 
-(def valmap {3 "Crackle" 5 "Pop"})
-
-(defn can-divide? [top bottom]
-  (= 0 (mod top bottom)))
-
-(doseq [i (range 0 (inc 100))]
-  (if (some true? (map #(can-divide? i %)
-           (keys valmap)))
-
-    ;; something is divisible, printem'
-    (doseq [[divide-check message] valmap]
-      (when (can-divide? i divide-check)
-        (print message)))
-
-    ;; nothing was divisible
-    (print i))
-  (println))
-
-
 (ns aoc.core
   (:gen-class))
 
