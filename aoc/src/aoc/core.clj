@@ -1,9 +1,5 @@
 ;; primarily touching this in a repl-buffer sort of way.
 
-
-;; A little much, I'm trying to practice clojure some more
-;; to run: put this in a file, have clojure, run clojure ./<file>.clj
-
 (ns aoc.core
   (:gen-class))
 
@@ -187,86 +183,116 @@
    (filter is-nice)
    (count)))
 
-(defn solve-2015-6-1 []
-  (defn get-square [corner corner2]
-    (let [x1 (first corner)
-          y1 (second corner)
-          x2 (first corner2)
-          y2 (second corner2)]
-      (for [x (range x1 (inc x2))
-            y (range y1 (inc y2))]
-        [x y])))
+  (defn solve-2015-6-1 []
+    (defn get-square [corner corner2]
+      (vec
+       (let [x1 (first corner)
+             y1 (second corner)
+             x2 (first corner2)
+             y2 (second corner2)]
+         (for [x (range x1 (inc x2))
+               y (range y1 (inc y2))]
+           [x y]))))
 
-  ;; (set ())
-  (set (concat '(1 2 3) #{1}))
+    (defn update-board [board coord change-func]
+      (let [y (first coord)
+            x (second coord)
+            current-val (-> board (nth y) (nth x))]
+        (assoc board y
+               (assoc (nth board y)
+                x
+                (change-func current-val)))))
 
-  (loop [board board]
-    (if (empty? board)
-      "yes"
-      (recur (drop 0 board))))
-
-  ;; change board
-  ;; [[true false true false]
-  ;;  [true false true false]]
-
-
-  (defn update-board [board x y val]
-    (assoc board x
-           (assoc (nth board x) y true)))
-
-  (defn do-move [action board corner corner2]
-    (case action
-      ;; "on" (set (concat board (get-square corner corner2)))
-      "on"
+    (defn process-moves
+      [board moves change-func]
       (loop [board board
-             moves (get-square corner corner2)]
-        (if (empty?)
-          )
-        )
+             moves moves]
+        (if (empty? moves)
+          board
+          (recur (update-board board (first moves) change-func)
+                 (drop 1 moves)))))
 
-      "off" (loop [board board
-                   remove (get-square corner corner2)]
-              (if (empty? remove)
-                board
-                (recur
-                 (disj board (first remove))
-                 (drop 1 remove))))
+    (defn do-instruction [action board coords]
+      (case action
+        "on" (process-moves board coords (constantly true))
+        "off" (process-moves board coords (constantly false))
+        "toggle" (process-moves board coords (fn [old-val] (not old-val)))
+        ))
 
-      "toggle" (loop [board board
-                      toggle (get-square corner corner2)]
-                 (if (empty? toggle)
-                   board
-                   (recur
-                    (let [ftoggle (first toggle)]
-                      (if (contains? board ftoggle)
-                        (disj board ftoggle)
-                        (conj board ftoggle)))
-                    (drop 1 toggle)
-                    )))
-      ))
+    (count
+     (filter
+      true?
+      (flatten
+       (loop [board (mapv vec (repeat 1000 (repeat 1000 false)))
+              moves (string/split (get-res "2015/6.txt") #"\n")]
 
-  (time (do-move "toggle" #{} [0 0] [500 500]))
+         (if (empty? moves)
+           board
+           (let [move (first moves)
+                 action (first (re-seq #"toggle|off|on" move))
+                 corner (take 2 (map read-string (re-seq #"\d+" move)))
+                 corner2 (take-last 2 (map read-string (re-seq #"\d+" move)))]
+             (recur (do-instruction action board (get-square corner corner2))
+                    (drop 1 moves))
+             )))))))
 
-  (time do-move)
+(defn solve-2015-6-2 []
+    (defn get-square [corner corner2]
+      (vec
+       (let [x1 (first corner)
+             y1 (second corner)
+             x2 (first corner2)
+             y2 (second corner2)]
+         (for [x (range x1 (inc x2))
+               y (range y1 (inc y2))]
+           [x y]))))
 
-  (loop
-      [board #{}
-       moves (string/split (get-res "2015/6.txt") #"\n")
-       ]
-    (let [move (first moves)
-          action (first (re-seq #"toggle|off|on" move))
-          corner (take 2 (map read-string (re-seq #"\d+" move)))
-          corner2 (take-last 2 (map read-string (re-seq #"\d+" move)))]
-      (if (empty? moves)
-        board
-        ;; (recur
-        ;;  (do-move action board corner corner2)
-        ;;  (drop 1 moves))
-        (do-move action board corner corner2)
-        ;; board
-        )))
+    (defn update-board [board coord change-func]
+      (let [y (first coord)
+            x (second coord)
+            current-val (-> board (nth y) (nth x))]
+        (assoc board y
+               (assoc (nth board y)
+                x
+                (change-func current-val)))))
 
-  ))
+    (defn process-moves
+      [board moves change-func]
+      (loop [board board
+             moves moves]
+        (if (empty? moves)
+          board
+          (recur (update-board board (first moves) change-func)
+                 (drop 1 moves)))))
+
+    (defn do-instruction [action board coords]
+      (case action
+        "on" (process-moves board coords (fn [old-val] (+ 1 old-val)))
+        "off" (process-moves board coords (fn [old-val]
+                                            (if (> old-val 0)
+                                                (- old-val 1)
+                                                0
+                                              )
+                                            ))
+        "toggle" (process-moves board coords (fn [old-val] (+ 2 old-val)))
+        ))
+
+    (apply +
+      (flatten
+       (loop [board (mapv vec (repeat 1000 (repeat 1000 0)))
+              moves (string/split (get-res "2015/6.txt") #"\n")]
+
+         (if (empty? moves)
+           board
+           (let [move (first moves)
+                 action (first (re-seq #"toggle|off|on" move))
+                 corner (take 2 (map read-string (re-seq #"\d+" move)))
+                 corner2 (take-last 2 (map read-string (re-seq #"\d+" move)))]
+             (recur (do-instruction action board (get-square corner corner2))
+                    (drop 1 moves))
+             ))))))
+
+(solve-2015-6-2)
 
 ;; unmap in userspace
 ;; (ns-unmap (find-ns nil) 'count)
