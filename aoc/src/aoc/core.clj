@@ -4,13 +4,13 @@
   (:gen-class))
 
 (require '[clojure.core :as core])
-
 (require '[clojure.java.shell :as shell])
 (require '[clojure.string :as string])
 
 ;; (require '[clojure.math.numeric-tower :as math])
 
 (require '[clojure.set :as set])
+
 (require '[clojure.edn :as edn])
 (require '[clojure.java.io :as io])
 
@@ -167,7 +167,7 @@
      (partition 3 1 word)))
 
   (defn has-buddy-pairs [word]
-    ;; I'm an IDIOT
+    ;; Im an IDIOT
     ;; re-seq is cool
     ;; self group referencing regexs, the future is 30 years ago
     (re-seq #"(\w{2})\w*\1" word))
@@ -183,118 +183,196 @@
    (filter is-nice)
    (count)))
 
-  (defn solve-2015-6-1 []
-    (defn get-square [corner corner2]
-      (vec
-       (let [x1 (first corner)
-             y1 (second corner)
-             x2 (first corner2)
-             y2 (second corner2)]
-         (for [x (range x1 (inc x2))
-               y (range y1 (inc y2))]
-           [x y]))))
+(defn solve-2015-6-1 []
+  (defn get-square [corner corner2]
+    (vec
+     (let [x1 (first corner)
+           y1 (second corner)
+           x2 (first corner2)
+           y2 (second corner2)]
+       (for [x (range x1 (inc x2))
+             y (range y1 (inc y2))]
+         [x y]))))
 
-    (defn update-board [board coord change-func]
-      (let [y (first coord)
-            x (second coord)
-            current-val (-> board (nth y) (nth x))]
-        (assoc board y
-               (assoc (nth board y)
-                x
-                (change-func current-val)))))
+  (defn update-board [board coord change-func]
+    (let [y (first coord)
+          x (second coord)
+          current-val (-> board (nth y) (nth x))]
+      (assoc board y
+             (assoc (nth board y)
+                    x
+                    (change-func current-val)))))
 
-    (defn process-moves
-      [board moves change-func]
-      (loop [board board
-             moves moves]
-        (if (empty? moves)
-          board
-          (recur (update-board board (first moves) change-func)
-                 (drop 1 moves)))))
+  (defn process-moves
+    [board moves change-func]
+    (loop [board board
+           moves moves]
+      (if (empty? moves)
+        board
+        (recur (update-board board (first moves) change-func)
+               (drop 1 moves)))))
 
-    (defn do-instruction [action board coords]
-      (case action
-        "on" (process-moves board coords (constantly true))
-        "off" (process-moves board coords (constantly false))
-        "toggle" (process-moves board coords (fn [old-val] (not old-val)))
-        ))
+  (defn do-instruction [action board coords]
+    (case action
+      "on" (process-moves board coords (constantly true))
+      "off" (process-moves board coords (constantly false))
+      "toggle" (process-moves board coords (fn [old-val] (not old-val)))
+      ))
 
-    (count
-     (filter
-      true?
-      (flatten
-       (loop [board (mapv vec (repeat 1000 (repeat 1000 false)))
-              moves (string/split (get-res "2015/6.txt") #"\n")]
+  (count
+   (filter
+    true?
+    (flatten
+     (loop [board (mapv vec (repeat 1000 (repeat 1000 false)))
+            moves (string/split (get-res "2015/6.txt") #"\n")]
 
-         (if (empty? moves)
-           board
-           (let [move (first moves)
-                 action (first (re-seq #"toggle|off|on" move))
-                 corner (take 2 (map read-string (re-seq #"\d+" move)))
-                 corner2 (take-last 2 (map read-string (re-seq #"\d+" move)))]
-             (recur (do-instruction action board (get-square corner corner2))
-                    (drop 1 moves))
-             )))))))
+       (if (empty? moves)
+         board
+         (let [move (first moves)
+               action (first (re-seq #"toggle|off|on" move))
+               corner (take 2 (map read-string (re-seq #"\d+" move)))
+               corner2 (take-last 2 (map read-string (re-seq #"\d+" move)))]
+           (recur (do-instruction action board (get-square corner corner2))
+                  (drop 1 moves))
+           )))))))
 
 (defn solve-2015-6-2 []
-    (defn get-square [corner corner2]
-      (vec
-       (let [x1 (first corner)
-             y1 (second corner)
-             x2 (first corner2)
-             y2 (second corner2)]
-         (for [x (range x1 (inc x2))
-               y (range y1 (inc y2))]
-           [x y]))))
+  (defn get-square [corner corner2]
+    (vec
+     (let [x1 (first corner)
+           y1 (second corner)
+           x2 (first corner2)
+           y2 (second corner2)]
+       (for [x (range x1 (inc x2))
+             y (range y1 (inc y2))]
+         [x y]))))
 
-    (defn update-board [board coord change-func]
-      (let [y (first coord)
-            x (second coord)
-            current-val (-> board (nth y) (nth x))]
-        (assoc board y
-               (assoc (nth board y)
-                x
-                (change-func current-val)))))
+  (defn update-board [board coord change-func]
+    (let [y (first coord)
+          x (second coord)
+          current-val (-> board (nth y) (nth x))]
+      (assoc board y
+             (assoc (nth board y)
+                    x
+                    (change-func current-val)))))
 
-    (defn process-moves
-      [board moves change-func]
-      (loop [board board
-             moves moves]
-        (if (empty? moves)
-          board
-          (recur (update-board board (first moves) change-func)
-                 (drop 1 moves)))))
+  (defn process-moves
+    [board moves change-func]
+    (loop [board board
+           moves moves]
+      (if (empty? moves)
+        board
+        (recur (update-board board (first moves) change-func)
+               (drop 1 moves)))))
 
-    (defn do-instruction [action board coords]
-      (case action
-        "on" (process-moves board coords (fn [old-val] (+ 1 old-val)))
-        "off" (process-moves board coords (fn [old-val]
-                                            (if (> old-val 0)
-                                                (- old-val 1)
-                                                0
-                                              )
-                                            ))
-        "toggle" (process-moves board coords (fn [old-val] (+ 2 old-val)))
-        ))
+  (defn do-instruction [action board coords]
+    (case action
+      "on" (process-moves board coords (fn [old-val] (+ 1 old-val)))
+      "off" (process-moves board coords (fn [old-val]
+                                          (if (> old-val 0)
+                                            (- old-val 1)
+                                            0
+                                            )
+                                          ))
+      "toggle" (process-moves board coords (fn [old-val] (+ 2 old-val)))
+      ))
 
-    (apply +
-      (flatten
-       (loop [board (mapv vec (repeat 1000 (repeat 1000 0)))
-              moves (string/split (get-res "2015/6.txt") #"\n")]
+  (apply +
+         (flatten
+          (loop [board (mapv vec (repeat 1000 (repeat 1000 0)))
+                 moves (string/split (get-res "2015/6.txt") #"\n")]
 
-         (if (empty? moves)
-           board
-           (let [move (first moves)
-                 action (first (re-seq #"toggle|off|on" move))
-                 corner (take 2 (map read-string (re-seq #"\d+" move)))
-                 corner2 (take-last 2 (map read-string (re-seq #"\d+" move)))]
-             (recur (do-instruction action board (get-square corner corner2))
-                    (drop 1 moves))
-             ))))))
+            (if (empty? moves)
+              board
+              (let [move (first moves)
+                    action (first (re-seq #"toggle|off|on" move))
+                    corner (take 2 (map read-string (re-seq #"\d+" move)))
+                    corner2 (take-last 2 (map read-string (re-seq #"\d+" move)))]
+                (recur (do-instruction action board (get-square corner corner2))
+                       (drop 1 moves))
+                ))))))
 
-(solve-2015-6-2)
+(defn solve-2015-7-1 []
+  ;; 123 -> x means that the signal 123 is provided to wire x.
+  ;; x AND y -> z means that the bitwise AND of wire x and wire y is provided to wire z.
+  ;; x OR y -> z means that the bitwise AND of wire x and wire y is provided to wire z.
+  ;; p LSHIFT 2 -> q means that the value from wire p is left-shifted by 2 and then provided to wire q.
+  ;; p RSHIFT 2 -> q means that the value from wire p is left-shifted by 2 and then provided to wire q.
+  ;; NOT e -> f means that the bitwise complement of the value from wire e is provided to wire f.
+
+  ;; always val -> dest
+  ;; get val, then put in dest
+
+  (def state {})
+
+  (defn do-move [state line]
+    (println line)
+    (let
+        [move (re-find #"LSHIFT|OR|RSHIFT|AND|NOT|\-\>" line)
+
+         left_ident
+         (last (re-find (re-pattern (apply str (concat "(.*) " move))) line))
+
+         right_ident
+         (last (re-find (re-pattern (apply str (concat move " (.*) ->"))) line))
+
+         left_value_fns
+         (when left_ident
+           (if (number? (read-string left_ident))
+             (read-string left_ident)
+             ((keyword left_ident) state)
+             )
+           )
+
+         right_value_fns
+         (when right_ident
+           (if (number? (read-string right_ident))
+             (read-string right_ident)
+             ((keyword right_ident) state))
+           )
+
+         destination
+         (last (re-find (re-pattern #" -> (.*)") line))
+         ]
+
+      (case move
+        "LSHIFT" (assoc state (keyword destination) (bit-shift-left left_value right_value))
+        "RSHIFT" (assoc state (keyword destination) (bit-shift-right left_value right_value))
+        "AND" (assoc state (keyword destination) (bit-and left_value right_value))
+        "OR" (assoc state (keyword destination) (bit-or left_value right_value))
+        "->" (assoc state (keyword destination) left_value)
+        "NOT" (assoc state (keyword destination) (bit-not right_value))
+        )
+      ))
+
+  (:a
+   (loop
+       [state {}
+        moves (string/split (get-res "2015/7.txt") #"\n")
+        ]
+     (if (empty? moves)
+       state
+       (recur
+        (do-move state (first moves))
+        (drop 1 moves)
+        ))))
+
+  (assoc state (keyword "a") 1)
+
+  (:a (assoc state (keyword "a") 1))
+
+
+
+  ;; forms
+  )
+
+;; (bit-and )
+;; (bit-or )
+;; (bit-shift-left 12 2)
+;; (bit-shift-right 12 2)
+
 
 ;; unmap in userspace
-;; (ns-unmap (find-ns nil) 'count)
+;; (ns-unmap (find-ns nil) count)
 
 (defn -main [& args] (println "nope"))
