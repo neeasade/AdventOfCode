@@ -18,7 +18,6 @@
   ;; drop trailing newline, keep string type vs collection of chars
   (apply str (drop-last (slurp (format "./res/%s" name)))))
 
-
 ;; 2015
 (defn solve-2015-1-1 []
   (apply + (map #(if (= % \() 1 -1) (get-res "2015/1.txt"))))
@@ -119,20 +118,16 @@
    (count)))
 
 (defn solve-2015-4-1-2 []
-  (import 'java.security.MessageDigest)
   (defn md5 [^String s]
-    (let [algorithm (MessageDigest/getInstance "MD5")
+    (let [algorithm (java.security.MessageDigest/getInstance "MD5")
           raw (.digest algorithm (.getBytes s))]
       (format "%032x" (BigInteger. 1 raw))))
 
-  (def key "yzbqklnj")
-
   (loop [i 0]
-    (let [current-hash (md5 (apply str (concat key (str i))))]
+    (let [current-hash (md5 (apply str (concat "yzbqklnj" (str i))))]
       ;; part 1: 00000
       ;; part 2: 000000
       (if (string/starts-with? current-hash "00000")
-        ;; current-hash
         i
         (recur (+' i 1)))))
   )
