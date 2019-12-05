@@ -431,6 +431,61 @@
        (if (= verb 99) (+ 1 noun) noun)
        (if (= verb 99) 0 (+ 1 verb))))))
 
+(defn solve-2019-3-1 []
+  ;; maintain 2 collections of points representing lines
+  ;; then find all intersections
+  ;; then find all intersection distances and sort
+  (defn line-input-to-points [moves]
+    (loop [moves moves
+           points []
+           x 0
+           y 0]
+      (prn moves)
+      (if (empty? moves)
+        points
+        (let [move (first moves)
+              move-action (first move)
+              move-distance (Integer/parseInt (apply str (drop 1 move)))
+              new-points (case move-action
+                           \U (mapv #(vec [x (+ y %)]) (range move-distance))
+                           \D (mapv #(vec [x (- y %)]) (range move-distance))
+                           \R (mapv #(vec [(+ x %) y]) (range move-distance))
+                           \L (mapv #(vec [(- x %) y]) (range move-distance)))
+              new-y (case move-action
+                      \U (+ y move-distance)
+                      \D (- y move-distance)
+                      y)
+
+              new-x (case move-action
+                      \R (+ x move-distance)
+                      \L (- x move-distance)
+                      x)
+              ]
+          (recur
+           (drop 1 moves)
+           (concat points new-points)
+           new-x
+           new-y
+           )))))
+
+
+  (let [
+        line1-points (line-input-to-points (string/split (nth (string/split (get-res "2019/3.txt") #"\n") 0) #","))
+        line2-points (line-input-to-points (string/split (nth (string/split (get-res "2019/3.txt") #"\n") 1) #","))
+
+        ;; line1-points (line-input-to-points ["R8" "U5" "L5" "D3"])
+        ;; line2-points (line-input-to-points ["U7" "R6" "D4" "L4"])
+        intersections (set/intersection (set line2-points) (set line1-points))
+        ]
+    ;; the first is the [0 0] erroneously placed by our point aggregation
+    (second
+     (sort <
+           (mapv
+            #(+ (Math/abs (first %)) (Math/abs (second %)))
+            intersections
+            )))
+    ))
+
 
 ;; unmap in userspace (for when you override somethin on accident and )
 ;; (ns-unmap (find-ns nil) count)
