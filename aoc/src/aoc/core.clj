@@ -394,7 +394,43 @@
                  (string/split (get-res "2019/1.txt") #"\n"))))
 
 (defn solve-2019-2-1 []
-  )
+  (defn do-fix [noun verb]
+    (loop [state
+           (-> (as-> (get-res "2019/2.txt") v
+                 (string/split v #",")
+                 (mapv #(Integer/parseInt %) v))
+               (assoc 1 noun)
+               (assoc 2 verb))
+           position 0]
+      (let [current-op (nth state position)
+            ;; delay evaluation because we might be peeking past state length wrt position
+            arg1 #(nth state (nth state (+ position 1)))
+            arg2 #(nth state (nth state (+ position 2)))
+            dest #(nth state (+ position 3))
+
+            new-state (case current-op
+                        1 (assoc state (dest) (+ (arg1) (arg2)))
+                        2 (assoc state (dest) (* (arg1) (arg2)))
+                        state
+                        )]
+        (if (= current-op 99)
+          (nth state 0)
+          (recur new-state (+ position 4))))
+      ))
+
+  (do-fix 12 2))
+
+(defn solve-2019-2-2 []
+  (solve-2019-2-1)
+
+  (loop [noun 0
+         verb 0]
+    (if (= (do-fix noun verb) 19690720)
+      (+ (* 100 noun) verb)
+      (recur
+       (if (= verb 99) (+ 1 noun) noun)
+       (if (= verb 99) 0 (+ 1 verb))))))
+
 
 ;; unmap in userspace (for when you override somethin on accident and )
 ;; (ns-unmap (find-ns nil) count)
