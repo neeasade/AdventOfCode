@@ -3,21 +3,19 @@
 (ns aoc.core
   (:gen-class))
 
-(require '[clojure.core :as core])
-(require '[clojure.java.shell :as shell])
-(require '[clojure.string :as string])
+;; eval this to setup
+(do
+  (require '[clojure.core :as core])
+  (require '[clojure.java.shell :as shell])
+  (require '[clojure.string :as string])
+  (require '[clojure.set :as set])
+  (require '[clojure.edn :as edn])
+  (require '[clojure.java.io :as io])
 
-;; (require '[clojure.math.numeric-tower :as math])
-
-(require '[clojure.set :as set])
-
-(require '[clojure.edn :as edn])
-(require '[clojure.java.io :as io])
-
-(defn get-res [name]
-  ;; drop trailing newline, keep string type vs collection of chars
-  (apply str (drop-last (slurp (format "./res/%s" name)))))
-
+  (defn get-res [name]
+    ;; drop trailing newline, keep string type vs collection of chars
+    (apply str (drop-last (slurp (format "./res/%s" name)))))
+  )
 
 ;; 2015
 (defn solve-2015-1-1 []
@@ -292,6 +290,7 @@
                        (drop 1 moves))
                 ))))))
 
+;; todo: you never finished this one
 (defn solve-2015-7-1 []
   ;; 123 -> x means that the signal 123 is provided to wire x.
   ;; x AND y -> z means that the bitwise AND of wire x and wire y is provided to wire z.
@@ -366,13 +365,42 @@
   ;; forms
   )
 
-;; (bit-and )
-;; (bit-or )
-;; (bit-shift-left 12 2)
-;; (bit-shift-right 12 2)
 
+(defn solve-2019-1-1 []
+  ;; mass / 3, round down, subtract 2
 
-;; unmap in userspace
+  (defn mass-to-fuel [mass]
+    (-> mass
+        (/ 3)
+        (Math/floor)
+        (int)
+        (- 2)))
+
+  (apply + (mapv #(mass-to-fuel (Integer/parseInt %))
+                 (string/split (get-res "2019/1.txt") #"\n"))))
+
+(defn solve-2019-1-2 []
+  (solve-2019-1-1)
+
+  (defn mass-to-full-fuel [mass]
+    (loop [total 0
+           current mass]
+      (let [new-fuel (mass-to-fuel current)]
+        (println (format "%s" new-fuel))
+        (if (<= new-fuel 0)
+          total
+          (recur
+           (+ total new-fuel)
+           new-fuel
+           )))))
+
+  (apply + (mapv #(mass-to-full-fuel (Integer/parseInt %))
+                 (string/split (get-res "2019/1.txt") #"\n"))))
+
+(defn solve-2019-2-1 []
+  )
+
+;; unmap in userspace (for when you override somethin on accident and )
 ;; (ns-unmap (find-ns nil) count)
 
 (defn -main [& args] (println "nope"))
