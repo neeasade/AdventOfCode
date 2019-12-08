@@ -363,8 +363,6 @@
 
 
 (defn solve-2019-1-1 []
-  ;; mass / 3, round down, subtract 2
-
   (defn mass-to-fuel [mass]
     (-> mass
         (/ 3)
@@ -485,6 +483,32 @@
             intersections
             )))
     ))
+
+(defn solve-2019-4-1 []
+  (defn is-match [n]
+    (and
+     ;; (and (> n start) (< n end))
+     (and (> n 99999) (< n 1000000))
+     (some #(= (first %) (second %))
+           (partition 2 1 (str n)))
+     (= (sort < (mapv #(Integer/parseInt (str %)) (str n)))
+        (mapv #(Integer/parseInt (str %)) (str n)))))
+
+  (count (filter is-match (range 206938 679128))))
+
+(defn solve-2019-4-2 []
+  (defn is-match [n]
+    (and
+     (->> n
+          str
+          (re-seq #"(.)\1{1,}") ;; one or more
+          (map first)
+          (some #(= (count %) 2)))
+
+     (= (sort < (mapv #(Integer/parseInt (str %)) (str n)))
+        (mapv #(Integer/parseInt (str %)) (str n)))))
+
+  (count (filter is-match (range 206938 679128))))
 
 
 ;; unmap in userspace (for when you override somethin on accident and )
