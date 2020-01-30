@@ -1,7 +1,14 @@
 ;; primarily touching this in a repl-buffer sort of way.
-
 (ns aoc.core
   (:gen-class))
+
+;; (require '[joker.core :as core])
+;; (require '[joker.string :as string])
+;; (require '[joker.set :as set])
+
+;; (require '[joker.java.shell :as shell])
+;; (require '[joker.java.io :as io])
+;; (require '[joker.edn :as edn])
 
 ;; eval this to setup
 (do
@@ -9,13 +16,13 @@
   (require '[clojure.java.shell :as shell])
   (require '[clojure.string :as string])
   (require '[clojure.set :as set])
-  (require '[clojure.edn :as edn])
   (require '[clojure.java.io :as io])
 
   (defn get-res [name]
     ;; drop trailing newline, keep string type vs collection of chars
     (apply str (drop-last (slurp (format "./res/%s" name)))))
   )
+
 
 ;; 2015
 (defn solve-2015-1-1 []
@@ -391,43 +398,42 @@
   (apply + (mapv #(mass-to-full-fuel (Integer/parseInt %))
                  (string/split (get-res "2019/1.txt") #"\n"))))
 
-(defn solve-2019-2-1 []
-  (defn do-fix [noun verb]
-    (loop [state
-           (-> (as-> (get-res "2019/2.txt") v
-                 (string/split v #",")
-                 (mapv #(Integer/parseInt %) v))
-               (assoc 1 noun)
-               (assoc 2 verb))
-           position 0]
-      (let [current-op (nth state position)
-            ;; delay evaluation because we might be peeking past state length wrt position
-            arg1 #(nth state (nth state (+ position 1)))
-            arg2 #(nth state (nth state (+ position 2)))
-            dest #(nth state (+ position 3))
+(defn do-fix [noun verb]
+  (loop [state
+         (-> (as-> (get-res "2019/2.txt") v
+               (string/split v #",")
+               (mapv #(Integer/parseInt %) v))
+             (assoc 1 noun)
+             (assoc 2 verb))
+         position 0]
+    (let [current-op (nth state position)
+          ;; delay evaluation because we might be peeking past state length wrt position
+          arg1 #(nth state (nth state (+ position 1)))
+          arg2 #(nth state (nth state (+ position 2)))
+          dest #(nth state (+ position 3))
 
-            new-state (case current-op
-                        1 (assoc state (dest) (+ (arg1) (arg2)))
-                        2 (assoc state (dest) (* (arg1) (arg2)))
-                        state
-                        )]
-        (if (= current-op 99)
-          (nth state 0)
-          (recur new-state (+ position 4))))
-      ))
+          new-state (case current-op
+                      1 (assoc state (dest) (+ (arg1) (arg2)))
+                      2 (assoc state (dest) (* (arg1) (arg2)))
+                      state
+                      )]
+      (if (= current-op 99)
+        (nth state 0)
+        (recur new-state (+ position 4))))
+    ))
 
-  (do-fix 12 2))
+(do-fix 12 2))
 
 (defn solve-2019-2-2 []
-  (solve-2019-2-1)
+(solve-2019-2-1)
 
-  (loop [noun 0
-         verb 0]
-    (if (= (do-fix noun verb) 19690720)
-      (+ (* 100 noun) verb)
-      (recur
-       (if (= verb 99) (+ 1 noun) noun)
-       (if (= verb 99) 0 (+ 1 verb))))))
+(loop [noun 0
+       verb 0]
+  (if (= (do-fix noun verb) 19690720)
+    (+ (* 100 noun) verb)
+    (recur
+     (if (= verb 99) (+ 1 noun) noun)
+     (if (= verb 99) 0 (+ 1 verb))))))
 
 (defn solve-2019-3-1 []
   ;; maintain 2 collections of points representing lines
@@ -510,8 +516,12 @@
 
   (count (filter is-match (range 206938 679128))))
 
+(defn solve-2019-5-1 []
+  )
 
 ;; unmap in userspace (for when you override somethin on accident and )
 ;; (ns-unmap (find-ns nil) count)
 
-(defn -main [& args] (println "nope"))
+(defn -main [& args]
+  (println "nope")
+  )
