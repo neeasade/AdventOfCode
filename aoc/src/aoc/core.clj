@@ -16,6 +16,7 @@
   (require '[clojure.java.shell :as shell])
   (require '[clojure.string :as string])
   (require '[clojure.set :as set])
+  (require '[clojure.stacktrace :as st])
   (require '[clojure.java.io :as io])
 
   (defn get-res [name]
@@ -294,79 +295,77 @@
                 ))))))
 
 ;; todo: you never finished this one
-(defn solve-2015-7-1 []
-  ;; 123 -> x means that the signal 123 is provided to wire x.
-  ;; x AND y -> z means that the bitwise AND of wire x and wire y is provided to wire z.
-  ;; x OR y -> z means that the bitwise AND of wire x and wire y is provided to wire z.
-  ;; p LSHIFT 2 -> q means that the value from wire p is left-shifted by 2 and then provided to wire q.
-  ;; p RSHIFT 2 -> q means that the value from wire p is left-shifted by 2 and then provided to wire q.
-  ;; NOT e -> f means that the bitwise complement of the value from wire e is provided to wire f.
+#_(defn solve-2015-7-1 []
+    ;; 123 -> x means that the signal 123 is provided to wire x.
+    ;; x AND y -> z means that the bitwise AND of wire x and wire y is provided to wire z.
+    ;; x OR y -> z means that the bitwise AND of wire x and wire y is provided to wire z.
+    ;; p LSHIFT 2 -> q means that the value from wire p is left-shifted by 2 and then provided to wire q.
+    ;; p RSHIFT 2 -> q means that the value from wire p is left-shifted by 2 and then provided to wire q.
+    ;; NOT e -> f means that the bitwise complement of the value from wire e is provided to wire f.
 
-  ;; always val -> dest
-  ;; get val, then put in dest
+    ;; always val -> dest
+    ;; get val, then put in dest
 
-  (def state {})
+    (def state {})
 
-  (defn do-move [state line]
-    (println line)
-    (let
-        [move (re-find #"LSHIFT|OR|RSHIFT|AND|NOT|\-\>" line)
+    (defn do-move [state line]
+      (println line)
+      (let
+          [move (re-find #"LSHIFT|OR|RSHIFT|AND|NOT|\-\>" line)
 
-         left_ident
-         (last (re-find (re-pattern (apply str (concat "(.*) " move))) line))
+           left_ident
+           (last (re-find (re-pattern (apply str (concat "(.*) " move))) line))
 
-         right_ident
-         (last (re-find (re-pattern (apply str (concat move " (.*) ->"))) line))
+           right_ident
+           (last (re-find (re-pattern (apply str (concat move " (.*) ->"))) line))
 
-         left_value_fns
-         (when left_ident
-           (if (number? (read-string left_ident))
-             (read-string left_ident)
-             ((keyword left_ident) state)
+           left_value_fns
+           (when left_ident
+             (if (number? (read-string left_ident))
+               (read-string left_ident)
+               ((keyword left_ident) state)
+               )
              )
-           )
 
-         right_value_fns
-         (when right_ident
-           (if (number? (read-string right_ident))
-             (read-string right_ident)
-             ((keyword right_ident) state))
-           )
+           right_value_fns
+           (when right_ident
+             (if (number? (read-string right_ident))
+               (read-string right_ident)
+               ((keyword right_ident) state))
+             )
 
-         destination
-         (last (re-find (re-pattern #" -> (.*)") line))
-         ]
+           destination
+           (last (re-find (re-pattern #" -> (.*)") line))
+           ]
 
-      (case move
-        "LSHIFT" (assoc state (keyword destination) (bit-shift-left left_value right_value))
-        "RSHIFT" (assoc state (keyword destination) (bit-shift-right left_value right_value))
-        "AND" (assoc state (keyword destination) (bit-and left_value right_value))
-        "OR" (assoc state (keyword destination) (bit-or left_value right_value))
-        "->" (assoc state (keyword destination) left_value)
-        "NOT" (assoc state (keyword destination) (bit-not right_value))
-        )
-      ))
+        (case move
+          "LSHIFT" (assoc state (keyword destination) (bit-shift-left left_value right_value))
+          "RSHIFT" (assoc state (keyword destination) (bit-shift-right left_value right_value))
+          "AND" (assoc state (keyword destination) (bit-and left_value right_value))
+          "OR" (assoc state (keyword destination) (bit-or left_value right_value))
+          "->" (assoc state (keyword destination) left_value)
+          "NOT" (assoc state (keyword destination) (bit-not right_value))
+          )
+        ))
 
-  (:a
-   (loop
-       [state {}
-        moves (string/split (get-res "2015/7.txt") #"\n")
-        ]
-     (if (empty? moves)
-       state
-       (recur
-        (do-move state (first moves))
-        (drop 1 moves)
-        ))))
+    (:a
+     (loop
+         [state {}
+          moves (string/split (get-res "2015/7.txt") #"\n")
+          ]
+       (if (empty? moves)
+         state
+         (recur
+          (do-move state (first moves))
+          (drop 1 moves)
+          ))))
 
-  (assoc state (keyword "a") 1)
+    (assoc state (keyword "a") 1)
 
-  (:a (assoc state (keyword "a") 1))
+    (:a (assoc state (keyword "a") 1))
 
-
-
-  ;; forms
-  )
+    ;; forms
+    )
 
 
 (defn solve-2019-1-1 []
@@ -422,18 +421,17 @@
         (recur new-state (+ position 4))))
     ))
 
-(do-fix 12 2))
-
 (defn solve-2019-2-2 []
-(solve-2019-2-1)
+  ;; (solve-2019-2-1)
 
-(loop [noun 0
-       verb 0]
-  (if (= (do-fix noun verb) 19690720)
-    (+ (* 100 noun) verb)
-    (recur
-     (if (= verb 99) (+ 1 noun) noun)
-     (if (= verb 99) 0 (+ 1 verb))))))
+  (loop [noun 0
+         verb 0]
+    (if (= (do-fix noun verb) 19690720)
+      (+ (* 100 noun) verb)
+      (recur
+       (if (= verb 99) (+ 1 noun) noun)
+       (if (= verb 99) 0 (+ 1 verb)))))
+  )
 
 (defn solve-2019-3-1 []
   ;; maintain 2 collections of points representing lines
@@ -517,11 +515,100 @@
   (count (filter is-match (range 206938 679128))))
 
 (defn solve-2019-5-1 []
+  (defn get-param-mode [n input]
+    (->>
+     (string/replace (format "%5s" input)
+                     " " "0")
+     (reverse)
+     (drop 2)
+     (#(nth % n))
+     (list)
+     (apply str)
+     (Integer/parseInt)
+     ))
+
+  (loop [state
+         (-> (as-> (get-res "2019/5.txt") v
+               (string/split v #",")
+               (mapv #(Integer/parseInt %) v)))
+
+         position 0
+         input [1]
+         ]
+
+    (let [full-op (nth state position)
+          current-op
+          (Integer/parseInt
+           (apply str
+                  (take-last 2 (format "%s" full-op)))
+           )
+
+          ;; (nth state position)
+
+          ;; (#(do (list % %)) 1)
+
+          lookup-arg-val #(if (= (get-param-mode % full-op) 0)
+                            ;; position mode
+                            (nth state (nth state (+ % position)))
+                            ;; immediate mode (assume param mode is 1)
+                            (nth state (+ % position))
+                            ;; (+ 1 position)
+                            )
+
+          arg1 #(lookup-arg-val 1)
+          arg2 #(lookup-arg-val 2)
+
+          arg3 #(if (= (get-param-mode % current-op) 0)
+                  (nth state (+ 1 % position))
+                  (+ 1 % position)
+                  )
+
+          op-length
+          (case current-op
+            1 4
+            2 4
+            3 2
+            4 2)
+
+          new-state (case current-op
+                      1 (assoc state (arg3 2) (+ (arg1) (arg2)))
+                      2 (assoc state (arg3 2) (* (arg1) (arg2)))
+                      3 (assoc state (arg3 0)
+                               (take 1 input))
+                      4 ;;(assoc state
+                      ;; output
+                      (println (arg1))
+                      ;; )
+                      state
+                      )]
+      (if (= current-op 99)
+        (nth state 0)
+        (recur
+         new-state
+         (+ position op-length)
+         (if (= current-op 3)
+           (drop 1 input)
+           input)
+         )))
+    )
+
+  ;; [1 2 3]
+  ;; (get-param-mode)
+  ;; (string/split (get-res "2019/5.txt") #",")
+
   )
 
 ;; unmap in userspace (for when you override somethin on accident and )
-;; (ns-unmap (find-ns nil) count)
+;; (ns-unmap (find-ns nil) list)
 
 (defn -main [& args]
-  (println "nope")
+  (println "arst")
+  (solve-2019-5-1)
+  )
+
+(try
+  (-main)
+  (catch Exception e
+    (st/print-stack-trace e)
+    )
   )
