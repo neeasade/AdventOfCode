@@ -1,10 +1,10 @@
 It's [[https://adventofcode.com/][advent of code]], in clojure. Different years are in various stages of "done-ness". This repo also involves me at different levels of clojure-fu. I'm primarily using this in a repl-buffer oriented fashion (emacs, lispy, cider).
 
--[[./src/aoc/2020.clj][2020]]
--[[./src/aoc/2019.clj][2019]]
--[[./src/aoc/2018.clj][2018]]
--[[./src/aoc/2017.clj][2017]]
--[[./src/aoc/2016.clj][2016]]
--[[./src/aoc/2015.clj][2015]]
+- [[./src/aoc/2020.clj][2020]]
+- [[./src/aoc/2019.clj][2019]]
+- [[./src/aoc/2018.clj][2018]]
+- [[./src/aoc/2017.clj][2017]]
+- [[./src/aoc/2016.clj][2016]]
+- [[./src/aoc/2015.clj][2015]]
 
 Daily solutions will be wrapped up in named functions returning solutions to a days puzzles in a vector. TODO: test these in test.clj with repo inputs

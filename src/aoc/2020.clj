@@ -7,39 +7,33 @@
            (filter #(= 2020 (apply + %)))
            first
            (apply *))))
-  [
-   (solve-comb 2)
-   (solve-comb 3)
-   ])
+  [(solve-comb 2) (solve-comb 3)])
 
 (defn solve-2020-2 [input-file]
-  [
-   ;; 1
-   (-> (get-input input-file)
-       (filter
-        (fn [line]
-          (let [[_ lower upper letter pass]
-                (first (re-seq #"([0-9]+)-([0-9]+) ([a-zA-Z]): (.+)" line))
-                lower (dec (Integer/parseInt lower))
-                upper (dec (Integer/parseInt upper))
-                ;; result (count (filter #(= (nth pass %) (first letter)) [lower upper]))
-                result (count (filter #(= % (first letter)) pass))]
-            (<= lower result upper))))
-       count)
+  [;; 1
+   (->> (get-input input-file)
+        (filter
+         (fn [line]
+           (let [[_ lower upper letter pass]
+                 (first (re-seq #"([0-9]+)-([0-9]+) ([a-zA-Z]): (.+)" line))
+                 lower (Integer/parseInt lower)
+                 upper (Integer/parseInt upper)
+                 result (count (filter #(= % (first letter)) pass))]
+             (<= lower result upper))))
+        count)
 
    ;; 2
-   (count
-    (filter
-     (fn [line]
-       (let [[_ lower upper letter pass]
-             (first (re-seq #"([0-9]+)-([0-9]+) ([a-zA-Z]): (.+)" line))
-             lower (dec (Integer/parseInt lower))
-             upper (dec (Integer/parseInt upper))
-             result (count (filter #(= (nth pass %) (first letter)) [lower upper]))]
-         (= result 1)))
-     (get-input input-file)))
-   ]
-  )
+   (->> (get-input input-file)
+        (filter
+         (fn [line]
+           (let [[_ lower upper letter pass]
+                 (first (re-seq #"([0-9]+)-([0-9]+) ([a-zA-Z]): (.+)" line))
+                 lower (dec (Integer/parseInt lower))
+                 upper (dec (Integer/parseInt upper))
+                 result (count (filter #(= (nth pass %) (first letter)) [lower upper]))]
+             (= result 1))))
+        count)
+   ])
 
 (defn solve-2020-3 [input-file]
   (defn sled [right down]
@@ -62,6 +56,4 @@
    (apply *
           (map #(apply sled %)
                [[1 1] [3 1] [5 1] [7 1] [1 2]]))
-   ]
-  )
-
+   ])
