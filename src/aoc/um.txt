@@ -1,0 +1,35 @@
+(defn sled [right down]
+  (let [lines (get-input "2020/3.txt")]
+    (:trees
+     (reduce
+      (fn [{:keys [w h trees]} line]
+        (if (zero? (mod h down))
+          {:w (+ right w)
+           :h (+ 1 h)
+           :trees (if (= \# (nth line (mod w (count line))))
+                    (inc trees) trees)}
+          {:w w :h (+ h 1) :trees trees}))
+      {:w 0 :h 0 :trees 0}
+      lines))))
+
+(apply *
+(map #(apply sled %)
+    [[1 1] [3 1] [5 1] [7 1] [1 2]]))
+
+(defn counting-trees [grid [right down]]
+  (->> grid
+       (keep-indexed
+        (fn [index row]
+          (when (zero? (mod index down)) row)))
+       (map-indexed
+        (fn [index row]
+          (get row (mod (* index right) (count row)))))
+       (filter #{\#})
+       (count)))
+
+(defn counting-trees-n [grid]
+  (reduce
+   (fn [n slope]
+     (* n (counting-trees grid slope)))
+   1
+   [[1 1] [3 1] [5 1] [7 1] [1 2]]))
