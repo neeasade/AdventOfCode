@@ -64,30 +64,20 @@
 (defn solve-2020-4 [input-file]
   (defn input-to-map []
     ;; the dirtiest part of this one
-    (->> (get-input input-file)
-         ;; split by newline
-         (reduce
-          (fn [acc token]
-            (if (string/blank? token)
-              (conj acc [])
-              (vec (concat
-                    (butlast acc)
-                    [(conj (last acc)
-                           token)]))))
-          [[]])
+    (->>
+     (string/split (get-res input-file) #"\n\n")
 
-         ;; form:
-         (map flatten)
-         (map #(string/join " " %))
-         (map #(string/split % #" "))
+     ;; form:
+     (map #(string/replace % #"\n" " "))
+     (map #(string/split % #" "))
 
-         ;; now, we have a collection of strings "key:val", so turn them into proper maps (still string-> string):
-         (map
-          (fn [coll]
-            (reduce
-             #(let [[key val] (string/split %2 #":")]
-                (assoc %1 key val))
-             {} coll)))))
+     ;; now, we have a collection of strings "key:val", so turn them into proper maps (still string-> string):
+     (map
+      (fn [coll]
+        (reduce
+         #(let [[key val] (string/split %2 #":")]
+            (assoc %1 key val))
+         {} coll)))))
 
   (defn validate [key val]
     (condp = key
@@ -125,3 +115,5 @@
      ]
     )
   )
+
+(#'aoc.core/solve-2020-4 "2020/4.txt")
