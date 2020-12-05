@@ -1,6 +1,7 @@
 
 (require '[clojure.string :as string])
 (require '[clojure.math.combinatorics :as comb])
+(require '[clojure.data :as data])
 
 (defn solve-2020-1 [input-file]
   (defn solve-comb [div]
@@ -115,5 +116,128 @@
      ]
     )
   )
+
+(map first
+
+
+
+     )
+
+(re-seq #"([BF]+)([RL]+)" (first
+
+                           (get-input "2020/4.txt"))
+        )
+
+(->>
+ (get-input "2020/4.txt")
+
+ (map
+  (fn [line]
+    (let [[_ v h] (first (re-seq #"([BF]+)([RL]+)" line))]
+      [
+       (first
+        (reduce
+         (fn [acc new]
+           (if (= new \F)
+             (first (split-at (/ (count acc) 2) acc))
+             (second (split-at (/ (count acc) 2) acc))))
+         (range 128)
+         v))
+
+
+       (or
+        (first
+         (reduce
+          (fn [acc new]
+            (if (= new \L)
+              (first (split-at (/ (count acc) 2) acc))
+              (second (split-at (/ (count acc) 2) acc))))
+          (range 7)
+          h))
+        0
+        )
+       ]
+      ))
+  )
+
+ (map
+  (fn [[row col]]
+    (+ col (* 8 row))
+    )
+  )
+
+ (sort >)
+ ((fn [all]
+    ;; (range (last all) (first all))
+    (prn (take 10 (range (last all) (first all))))
+    (prn (take 10 (reverse all)))
+    (data/diff
+     (range (last all) (first all))
+     (reverse all)
+     )
+    )
+  )
+
+ ;; (filter #(<= 740 % 750))
+ ;; (group-by first)
+ ;; (sort-by #(count (second %)) <)
+ ;; (data/diff (reverse (range 994)))
+
+ (first)
+ ;; (second)
+
+ (filter #(not (nil? %)))
+ (filter #(<= 740 % 750))
+
+ )
+
+(->>
+ (get-input "2020/4.txt")
+
+ (map
+  (fn [line]
+    (let [[_ rows cols] (first (re-seq #"([BF]+)([RL]+)" line))
+          splitter
+          (fn [lower-letter]
+            (fn [[acc new]] ((if (= new lower-letter) first second)
+                             (split-at (/ (count acc) 2) acc))))
+          ]
+      [(reduce (splitter \F) (range 128) rows)
+       (reduce (splitter \L) (range 7) rows)
+       ])))
+
+ (map
+  (fn [[row col]]
+    (+ col (* 8 row))
+    )
+  )
+
+ (sort >)
+ ((fn [all]
+    ;; (range (last all) (first all))
+    (prn (take 10 (range (last all) (first all))))
+    (prn (take 10 (reverse all)))
+    (data/diff
+     (range (last all) (first all))
+     (reverse all)
+     )
+    )
+  )
+
+ ;; (filter #(<= 740 % 750))
+ ;; (group-by first)
+ ;; (sort-by #(count (second %)) <)
+ ;; (data/diff (reverse (range 994)))
+
+ (first)
+ ;; (second)
+
+ (filter #(not (nil? %)))
+ (filter #(<= 740 % 750))
+
+ )
+
+
+
 
 (#'aoc.core/solve-2020-4 "2020/4.txt")
