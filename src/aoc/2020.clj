@@ -238,22 +238,19 @@
 
  )
 
-
-
 (defn solve-2020-6 [input-file]
   [(->>
     (string/split (get-res input-file) #"\n\n")
     (map #(string/replace % "\n" ""))
-    (map #(reduce conj #{} %))
+    (map #(set %))
     (map count)
     (apply +))
 
    (->>
     (string/split (get-res input-file) #"\n\n")
     (map #(string/split % #"\n"))
-    (map
-     (fn [letters]
-       (map #(reduce conj #{} %) letters)))
+    (map #(map set %))
     (map #(apply set/intersection %))
     (map count)
     (apply +))])
+
