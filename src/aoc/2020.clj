@@ -2,6 +2,7 @@
 (require '[clojure.string :as string])
 (require '[clojure.math.combinatorics :as comb])
 (require '[clojure.data :as data])
+(require '[clojure.set :as set])
 
 (defn solve-2020-1 [input-file]
   (defn solve-comb [div]
@@ -239,5 +240,20 @@
 
 
 
+(defn solve-2020-6 [input-file]
+  [(->>
+    (string/split (get-res input-file) #"\n\n")
+    (map #(string/replace % "\n" ""))
+    (map #(reduce conj #{} %))
+    (map count)
+    (apply +))
 
-(#'aoc.core/solve-2020-4 "2020/4.txt")
+   (->>
+    (string/split (get-res input-file) #"\n\n")
+    (map #(string/split % #"\n"))
+    (map
+     (fn [letters]
+       (map #(reduce conj #{} %) letters)))
+    (map #(apply set/intersection %))
+    (map count)
+    (apply +))])
