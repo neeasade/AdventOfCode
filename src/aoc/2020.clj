@@ -3,6 +3,7 @@
 (require '[clojure.math.combinatorics :as comb])
 (require '[clojure.data :as data])
 (require '[clojure.set :as set])
+(require '[clojure.core :as core])
 
 (defn solve-2020-1 [input-file]
   (defn solve-comb [div]
@@ -13,13 +14,12 @@
            (apply *))))
   [(solve-comb 2) (solve-comb 3)])
 
+
 (defn solve-2020-2 [input-file]
-  [;; 1
-   (->> (get-input input-file)
+  [(->> (get-input input-file) ;; 1
         (filter
          (fn [line]
-           (let [[_ lower upper letter pass]
-                 (first (re-seq #"([0-9]+)-([0-9]+) ([a-zA-Z]): (.+)" line))
+           (let [[_ lower upper letter pass] (first (re-seq #"([0-9]+)-([0-9]+) ([a-zA-Z]): (.+)" line))
                  lower (Integer/parseInt lower)
                  upper (Integer/parseInt upper)
                  result (count (filter #(= % (first letter)) pass))]
@@ -228,7 +228,6 @@
  ;; (filter #(<= 740 % 750))
  ;; (group-by first)
  ;; (sort-by #(count (second %)) <)
- ;; (data/diff (reverse (range 994)))
 
  (first)
  ;; (second)
@@ -238,11 +237,12 @@
 
  )
 
+
 (defn solve-2020-6 [input-file]
   [(->>
     (string/split (get-res input-file) #"\n\n")
     (map #(string/replace % "\n" ""))
-    (map #(set %))
+    (map set)
     (map count)
     (apply +))
 
@@ -254,3 +254,55 @@
     (map count)
     (apply +))])
 
+(solve-2020-6 "2020/6.txt")
+
+
+
+
+(defn solve 2020-7 [input-file]
+  (defn line-to-node [line]
+    (let
+        [[container contains]
+         (string/split line #" bags contain")
+         contains (string/split contains #",")]
+      (->> contains
+           (map (fn [c] (re-matches #" ([0-9]+) (.+) bags?\.?" c)))
+           (reduce
+            (fn [acc [full count key]]
+              (assoc acc key (when count (Integer/parseInt count))))
+            {})
+           (assoc {} container))))
+
+  (defn can-hold [kind node-map]
+    "return kinds a particular bag can hold, nested"
+    (let [holds (keys (get node-map kind))]
+      (conj (map #(can-hold % node-map) holds) holds)))
+
+  (defn count-holds [kind node-map]
+    (let [holds (get node-map kind)]
+      (if (= holds {nil nil})
+        1
+        ;; inc for the holding bag
+        (inc
+         (apply +
+                (map
+                 (fn [[key count]]
+                   (* count (count-holds key  node-map)))
+                 holds))))))
+
+  (let [node-map (->>
+                  (get-input  "2020/7.txt")
+                  (map line-to-node)
+                  (reduce into {}))]
+
+    [(count
+      (filter
+       #(some (partial = "shiny gold")
+              (->> (can-hold % node-map)
+                   (flatten)
+                   (remove nil?)
+                   (doall)))
+       (keys node-map)))
+
+     (dec (count-holds "shiny gold" node-map))
+     ]))
