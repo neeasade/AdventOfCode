@@ -14,7 +14,6 @@
            (apply *))))
   [(solve-comb 2) (solve-comb 3)])
 
-
 (defn solve-2020-2 [input-file]
   [(->> (get-input input-file) ;; 1
         (filter
@@ -118,125 +117,122 @@
     )
   )
 
-(map first
+(defn solve-2020-5 [input-file]
+  ;; this one needs cleaned up -- day of, I did some munging
+
+  (re-seq #"([BF]+)([RL]+)" (first
+
+                             (get-input "2020/4.txt"))
+          )
+
+  (->>
+   (get-input "2020/5.txt")
+
+   (map
+    (fn [line]
+      (let [[_ v h] (first (re-seq #"([BF]+)([RL]+)" line))]
+        [
+         (first
+          (reduce
+           (fn [acc new]
+             (if (= new \F)
+               (first (split-at (/ (count acc) 2) acc))
+               (second (split-at (/ (count acc) 2) acc))))
+           (range 128)
+           v))
 
 
-
-     )
-
-(re-seq #"([BF]+)([RL]+)" (first
-
-                           (get-input "2020/4.txt"))
-        )
-
-(->>
- (get-input "2020/4.txt")
-
- (map
-  (fn [line]
-    (let [[_ v h] (first (re-seq #"([BF]+)([RL]+)" line))]
-      [
-       (first
-        (reduce
-         (fn [acc new]
-           (if (= new \F)
-             (first (split-at (/ (count acc) 2) acc))
-             (second (split-at (/ (count acc) 2) acc))))
-         (range 128)
-         v))
-
-
-       (or
-        (first
-         (reduce
-          (fn [acc new]
-            (if (= new \L)
-              (first (split-at (/ (count acc) 2) acc))
-              (second (split-at (/ (count acc) 2) acc))))
-          (range 7)
-          h))
-        0
-        )
-       ]
-      ))
-  )
-
- (map
-  (fn [[row col]]
-    (+ col (* 8 row))
+         (or
+          (first
+           (reduce
+            (fn [acc new]
+              (if (= new \L)
+                (first (split-at (/ (count acc) 2) acc))
+                (second (split-at (/ (count acc) 2) acc))))
+            (range 7)
+            h))
+          0
+          )
+         ]
+        ))
     )
-  )
 
- (sort >)
- ((fn [all]
-    ;; (range (last all) (first all))
-    (prn (take 10 (range (last all) (first all))))
-    (prn (take 10 (reverse all)))
-    (data/diff
-     (range (last all) (first all))
-     (reverse all)
-     )
+   (map
+    (fn [[row col]]
+      (+ col (* 8 row))
+      )
     )
-  )
 
- ;; (filter #(<= 740 % 750))
- ;; (group-by first)
- ;; (sort-by #(count (second %)) <)
- ;; (data/diff (reverse (range 994)))
-
- (first)
- ;; (second)
-
- (filter #(not (nil? %)))
- (filter #(<= 740 % 750))
-
- )
-
-(->>
- (get-input "2020/4.txt")
-
- (map
-  (fn [line]
-    (let [[_ rows cols] (first (re-seq #"([BF]+)([RL]+)" line))
-          splitter
-          (fn [lower-letter]
-            (fn [[acc new]] ((if (= new lower-letter) first second)
-                             (split-at (/ (count acc) 2) acc))))
-          ]
-      [(reduce (splitter \F) (range 128) rows)
-       (reduce (splitter \L) (range 7) rows)
-       ])))
-
- (map
-  (fn [[row col]]
-    (+ col (* 8 row))
+   (sort >)
+   ((fn [all]
+      ;; (range (last all) (first all))
+      (prn (take 10 (range (last all) (first all))))
+      (prn (take 10 (reverse all)))
+      (data/diff
+       (range (last all) (first all))
+       (reverse all)
+       )
+      )
     )
-  )
 
- (sort >)
- ((fn [all]
-    ;; (range (last all) (first all))
-    (prn (take 10 (range (last all) (first all))))
-    (prn (take 10 (reverse all)))
-    (data/diff
-     (range (last all) (first all))
-     (reverse all)
-     )
+   ;; (filter #(<= 740 % 750))
+   ;; (group-by first)
+   ;; (sort-by #(count (second %)) <)
+   ;; (data/diff (reverse (range 994)))
+
+   (first)
+   ;; (second)
+
+   (filter #(not (nil? %)))
+   (filter #(<= 740 % 750))
+
+   )
+
+  (->>
+   (get-input "2020/4.txt")
+
+   (map
+    (fn [line]
+      (let [[_ rows cols] (first (re-seq #"([BF]+)([RL]+)" line))
+            splitter
+            (fn [lower-letter]
+              (fn [[acc new]] ((if (= new lower-letter) first second)
+                               (split-at (/ (count acc) 2) acc))))
+            ]
+        [(reduce (splitter \F) (range 128) rows)
+         (reduce (splitter \L) (range 7) rows)
+         ])))
+
+   (map
+    (fn [[row col]]
+      (+ col (* 8 row))
+      )
     )
+
+   (sort >)
+   ((fn [all]
+      ;; (range (last all) (first all))
+      (prn (take 10 (range (last all) (first all))))
+      (prn (take 10 (reverse all)))
+      (data/diff
+       (range (last all) (first all))
+       (reverse all)
+       )
+      )
+    )
+
+   ;; (filter #(<= 740 % 750))
+   ;; (group-by first)
+   ;; (sort-by #(count (second %)) <)
+
+   (first)
+   ;; (second)
+
+   (filter #(not (nil? %)))
+   (filter #(<= 740 % 750))
+   )
+
   )
-
- ;; (filter #(<= 740 % 750))
- ;; (group-by first)
- ;; (sort-by #(count (second %)) <)
-
- (first)
- ;; (second)
-
- (filter #(not (nil? %)))
- (filter #(<= 740 % 750))
-
- )
-
 
 (defn solve-2020-6 [input-file]
   [(->>
@@ -254,11 +250,6 @@
     (map count)
     (apply +))])
 
-(solve-2020-6 "2020/6.txt")
-
-
-
-
 (defn solve 2020-7 [input-file]
   (defn line-to-node [line]
     (let
@@ -273,10 +264,11 @@
             {})
            (assoc {} container))))
 
-  (defn can-hold [kind node-map]
-    "return kinds a particular bag can hold, nested"
-    (let [holds (keys (get node-map kind))]
-      (conj (map #(can-hold % node-map) holds) holds)))
+  (defn can-hold [kind]
+    ;; delay
+    (let [holds (keys (get node-map-global kind))]
+      (conj (map  #(delay (can-hold %)) holds) holds)))
+
 
   (defn count-holds [kind node-map]
     (let [holds (get node-map kind)]
@@ -290,19 +282,47 @@
                    (* count (count-holds key  node-map)))
                  holds))))))
 
-  (let [node-map (->>
-                  (get-input  "2020/7.txt")
-                  (map line-to-node)
-                  (reduce into {}))]
+  (time
+   (let [node-map (->>
+                   (get-input input-file)
+                   (map line-to-node)
+                   (reduce into {}))]
 
-    [(count
-      (filter
-       #(some (partial = "shiny gold")
-              (->> (can-hold % node-map)
-                   (flatten)
-                   (remove nil?)
-                   (doall)))
-       (keys node-map)))
+     [(count
+       (filter
+        #(some (partial = "shiny gold")
+               (->> (can-hold % node-map)
+                    (flatten)
+                    (remove nil?)
+                    (doall)))
+        (keys node-map)))
 
-     (dec (count-holds "shiny gold" node-map))
-     ]))
+      ;; (dec (count-holds "shiny gold" node-map))
+      ]))
+
+  )
+
+(defn 2020-8 [input-file]
+  (defn 2020-8-1 []
+    (let [instructions (get-input input-file)]
+      (loop [state {:position 0 :acc 0 :seen []}]
+        (let [{:keys [position acc seen]} state]
+          (if (some (partial = position) seen)
+            acc
+            (recur
+             (let [[_ action amount] (re-matches #"(acc|jmp|nop) (.+)" (nth instructions position))
+                   amount (Integer/parseInt amount)
+                   state (assoc state :seen (conj (:seen state) position))]
+               (condp = action
+                 "acc" (-> state
+                           (assoc :acc (+ acc amount))
+                           (assoc :position (inc position)))
+                 "nop" (assoc state :position (inc position))
+                 "jmp" (assoc state :position (+ position amount))))))))))
+
+  [(2020-8-1)
+   nil
+   ])
+
+(defn 2020-9 [input-file]
+  )
