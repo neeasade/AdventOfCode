@@ -252,7 +252,7 @@
     (map count)
     (apply +))])
 
-(defn solve 2020-7 [input-file]
+(defn solve-2020-7 [input-file]
   (defn line-to-node [line]
     (let
         [[container contains]
@@ -266,9 +266,9 @@
             {})
            (assoc {} container))))
 
-  (defn can-hold [kind]
+  (defn can-hold [kind node-map]
     ;; delay
-    (let [holds (keys (get node-map-global kind))]
+    (let [holds (keys (get node-map kind))]
       (conj (map  #(delay (can-hold %)) holds) holds)))
 
 
@@ -299,13 +299,11 @@
                     (doall)))
         (keys node-map)))
 
-      ;; (dec (count-holds "shiny gold" node-map))
-      ]))
+      (dec (count-holds "shiny gold" node-map))
+      ])))
 
-  )
-
-(defn 2020-8 [input-file]
-  (defn 2020-8-1 []
+(defn solve-2020-8 [input-file]
+  (defn solve-2020-8-1 []
     (let [instructions (get-input input-file)]
       (loop [state {:position 0 :acc 0 :seen []}]
         (let [{:keys [position acc seen]} state]
@@ -322,11 +320,11 @@
                  "nop" (assoc state :position (inc position))
                  "jmp" (assoc state :position (+ position amount))))))))))
 
-  [(2020-8-1)
+  [(solve-2020-8-1)
    nil
    ])
 
-(defn 2020-9 [input-file]
+(defn solve-2020-9 [input-file]
   (defn inits [coll] (reductions conj [] coll))
 
   (defn tails [coll] (take-while seq (iterate rest coll)))
