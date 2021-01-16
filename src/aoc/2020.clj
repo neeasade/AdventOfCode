@@ -1,6 +1,7 @@
 
 (require '[clojure.string :as string])
 (require '[clojure.math.combinatorics :as comb])
+
 (require '[clojure.data :as data])
 (require '[clojure.set :as set])
 (require '[clojure.core :as core])
@@ -12,7 +13,8 @@
            (filter #(= 2020 (apply + %)))
            first
            (apply *))))
-  [(solve-comb 2) (solve-comb 3)])
+  [(solve-comb 2)
+   (solve-comb 3)])
 
 (defn solve-2020-2 [input-file]
   [(->> (get-input input-file) ;; 1
@@ -325,4 +327,43 @@
    ])
 
 (defn 2020-9 [input-file]
-  )
+  (defn inits [coll] (reductions conj [] coll))
+
+  (defn tails [coll] (take-while seq (iterate rest coll)))
+
+
+  (let [all-input
+        (map #(Long/parseLong %)
+             (get-input "2020/9.txt")
+             ;; (get-input "2020/9-sample.txt")
+             )
+        running-count 25
+        ;; running-count 5
+
+        part-1
+        (reduce
+         (fn [acc new]
+           (if (->>
+                (comb/combinations acc 2)
+                (not-any? #(= (apply + %) new)))
+             (reduced new)
+             (concat (drop 1 acc) [new])))
+         (take running-count all-input)
+         (drop running-count all-input))
+
+        part-2
+        (reduce
+         (fn [acc new]
+           (if-let [result (first
+                            (filter
+                             #(= (apply + %) part-1)
+                             (mapcat tails (inits acc))
+                             ))]
+             (reduced
+              (+ (first (sort > result))
+                 (last (sort > result))))
+             (concat (drop 1 acc) [new])))
+         (take running-count all-input)
+         (drop running-count all-input))]
+
+    [part-1 part-2]))

@@ -6,6 +6,8 @@
   :dependencies [
                  [org.clojure/clojure "1.10.0"]
                  [org.clojure/math.combinatorics "0.1.4"]
+                 [net.mikera/core.matrix "0.62.0"]
+                 [hashp "0.2.0"]
                  [philoskim/debux "0.7.7"]
                  ]
   :main ^:skip-aot aoc.core
